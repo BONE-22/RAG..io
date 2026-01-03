@@ -2,13 +2,15 @@ from langchain_community.vectorstores import FAISS
 import pandas as pd
 from langchain_huggingface import HuggingFaceEmbeddings
 
-# Load dataset
+#讀取資料集
 animal_data = pd.read_csv("animal-fun-facts-dataset.csv")
 
+#初始化 Embedding Function ( 使用模型將文字轉為向量 )
 embedding_function = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
+# 準備 Metadata 
 metadatas = []
 for i, row in animal_data.iterrows():
     metadatas.append(
@@ -20,8 +22,10 @@ for i, row in animal_data.iterrows():
         }
     )
 
+# 確保文本欄位是字串格式 
 animal_data["text"] = animal_data["text"].astype(str)
 
+# 建立 FAISS 向量資料庫 
 faiss = FAISS.from_texts(animal_data["text"].to_list(), embedding_function, metadatas)
 
 query = "What is ship of the desert?"
